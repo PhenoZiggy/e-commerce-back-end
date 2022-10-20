@@ -31,7 +31,7 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ message: 'Email and Password Required' });
-  const foundUser = await User.find({ email: email })
+  const foundUser = await User.findOne({ email: email })
     .then((result) => {
       return result;
     })
@@ -39,11 +39,14 @@ export const loginUser = async (req, res) => {
       return res.status(500).json({ message: 'Error while searching for a user', error: error });
     });
 
-  if (foundUser.length === 1) {
-
-    // const matchPassword = await bcrypt.compare(password , foundUser[0])
-    console.log(foundUser);
+  if (foundUser) {
+    const matchPassword = await bcrypt.compare(password, foundUser.password);
+    if (matchPassword) {
+      res.status(200).json({ message: 'User Authorized', user: foundUser });
+    } else {
+      res.status(401).json({ message: 'Password Missmatch!' });
+    }
   } else {
-    res.status(401).json({ message: 'Already existing user' });
+    res.status(404).json({ message: 'User notfound!' });
   }
 };
