@@ -34,6 +34,10 @@ const userSchema = new Schema(
       type: JSON,
       required: false,
     },
+    token: {
+      type: JSON,
+      required: false,
+    },
   },
   {
     timestamps: true,
